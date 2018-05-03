@@ -1,5 +1,5 @@
 // #include "MyMap.h"
-#include "AVLtree.h"
+#include "AVLtree.cpp"
 #include <iostream>
 #include <algorithm>
 #include <stdlib.h>

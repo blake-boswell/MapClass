@@ -17,15 +17,22 @@ class MyMap {
     public:
         class iterator: public AVLTree<Key, T> {
             private:
+                AVLNode<Key, T>* position;
             public:
                 iterator();
                 ~iterator();
-                iterator operator*() {
-
+                value_type operator*() {
+                    return (position->data);
                 }
                 // Post-fix ++
                 iterator operator++(int) {
                     // data++;
+                    if(position->right != NULL && position->left != NULL) {
+                        position = getSmallest(position->left);
+                        return position;
+                    } else if(position->left != NULL) {
+                        
+                    }
                 }
                 void set(int value) {
                     // data = value;

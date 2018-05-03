@@ -320,6 +320,18 @@ AVLNode<Key, T>* AVLTree<Key, T>::getLargest(AVLNode<Key, T>* node) {
 }
 
 template<typename Key, typename T>
+AVLNode<Key, T>* AVLTree<Key, T>::getSmallest(AVLNode<Key, T>* node) {
+    if(node == NULL) {
+        return NULL;
+    }
+    if(node->left != NULL) {
+        return getSmallest(node->left);
+    } else {
+        return node;
+    }
+}
+
+template<typename Key, typename T>
 pair<Key, T> AVLTree<Key, T>::deleteMax(AVLNode<Key, T>* &node) {
     AVLNode<Key, T>* predecessor = getLargest(node);
     pair<Key, T> data = predecessor->data;
@@ -550,5 +562,5 @@ bool AVLTree<Key, T>::check() {
 }
 
 
-template class AVLTree<int, int>;
-template class AVLTree<string, int>;
+// template class AVLTree<int, int>;
+// template class AVLTree<string, int>;

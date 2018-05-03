@@ -49,6 +49,8 @@ public:
 
 protected:
     AVLNode<Key, T>* root;
+    AVLNode<Key, T>* getLargest(AVLNode<Key, T>* node);
+    AVLNode<Key, T>* getSmallest(AVLNode<Key, T>* node);
 
 private:
     void copyTree(AVLNode<Key, T>* &thisRoot, AVLNode<Key, T>* &sourceRoot);
@@ -71,7 +73,7 @@ private:
     void calculateBalanceFactors(AVLNode<Key, T>* &node);
     int sizeHelper(AVLNode<Key, T>* node, int &size);
     bool checkHelper(AVLNode<Key, T>* node);
-    AVLNode<Key, T>* getLargest(AVLNode<Key, T>* node);
+
 
 };
 #endif
