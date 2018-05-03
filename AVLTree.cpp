@@ -5,11 +5,13 @@
 
 using namespace std;
 
-AVLTree::AVLTree(): BinarySearchTree() {
+template<typename Key, typename T>
+AVLTree<Key, T>::AVLTree() {
     this->root = NULL;
 }
 
-AVLTree::AVLTree(AVLTree* tree) {
+template<typename Key, typename T>
+AVLTree<Key, T>::AVLTree(AVLTree<Key, T>* tree) {
     if(tree->root == NULL) {
         this->root = NULL;
     } else {
@@ -17,11 +19,12 @@ AVLTree::AVLTree(AVLTree* tree) {
     }
 }
 
-void AVLTree::copyTree(AVLNode* &thisRoot, AVLNode* &sourceRoot) {
+template<typename Key, typename T>
+void AVLTree<Key, T>::copyTree(AVLNode<Key, T>* &thisRoot, AVLNode<Key, T>* &sourceRoot) {
     if(sourceRoot == NULL) {
         thisRoot = NULL;
     } else {
-        thisRoot = new AVLNode;
+        thisRoot = new AVLNode<Key, T>;
         thisRoot->data = sourceRoot->data;
         thisRoot->balanceFactor = sourceRoot->balanceFactor;
         copyTree(thisRoot->left, sourceRoot->left);
@@ -29,15 +32,17 @@ void AVLTree::copyTree(AVLNode* &thisRoot, AVLNode* &sourceRoot) {
     }
 }
 
-AVLTree::~AVLTree() {
+template<typename Key, typename T>
+AVLTree<Key, T>::~AVLTree() {
     delete root;
 }
 
-void AVLTree::rrRotation(AVLNode* &node, bool isInsert) {
+template<typename Key, typename T>
+void AVLTree<Key, T>::rrRotation(AVLNode<Key, T>* &node, bool isInsert) {
    // cout << "RR ROT on " << node->data << endl;
-    AVLNode* oldRoot = node;
+    AVLNode<Key, T>* oldRoot = node;
     node = oldRoot->right;
-    AVLNode* tempLeft = node->left;
+    AVLNode<Key, T>* tempLeft = node->left;
     node->left = oldRoot;
     node->left->right = tempLeft;
 
@@ -59,14 +64,15 @@ void AVLTree::rrRotation(AVLNode* &node, bool isInsert) {
     
 }
 
-void AVLTree::rlRotation(AVLNode* &node, bool isInsert) {
+template<typename Key, typename T>
+void AVLTree<Key, T>::rlRotation(AVLNode<Key, T>* &node, bool isInsert) {
     // cout << "RL ROT on " << node->data << endl;
     int oldRLBalanceFactor = node->right->left->balanceFactor;
-    AVLNode* temp = node;
+    AVLNode<Key, T>* temp = node;
     node = node->right->left;
-    AVLNode* tempLeft = node->left;
+    AVLNode<Key, T>* tempLeft = node->left;
     node->left = temp;
-    AVLNode* tempRight = node->right;
+    AVLNode<Key, T>* tempRight = node->right;
     node->right = temp->right;
     temp->right = tempLeft;
     node->right->left = tempRight;
@@ -104,12 +110,13 @@ void AVLTree::rlRotation(AVLNode* &node, bool isInsert) {
 
 }
 
-void AVLTree::llRotation(AVLNode* &node, bool isInsert) {
+template<typename Key, typename T>
+void AVLTree<Key, T>::llRotation(AVLNode<Key, T>* &node, bool isInsert) {
     // cout << "LL ROT on " << node->data << endl;
     int oldLLBalanceFactor = node->left->left->balanceFactor;
-    AVLNode* oldRoot = node;
+    AVLNode<Key, T>* oldRoot = node;
     node = node->left;
-    AVLNode* tempRight = node->right;
+    AVLNode<Key, T>* tempRight = node->right;
     node->right = oldRoot;
     node->right->left = tempRight;
 
@@ -136,14 +143,15 @@ void AVLTree::llRotation(AVLNode* &node, bool isInsert) {
     
 }
 
-void AVLTree::lrRotation(AVLNode* &node, bool isInsert) {
+template<typename Key, typename T>
+void AVLTree<Key, T>::lrRotation(AVLNode<Key, T>* &node, bool isInsert) {
     // Pull up new root to this subtree
     // cout << "LR ROT on " << node->data << endl;
     int oldLRBalanceFactor = node->left->right->balanceFactor;
-    AVLNode* temp;
+    AVLNode<Key, T>* temp;
     temp = node;
     node = temp->left->right;
-    AVLNode* tempRight = node->right;
+    AVLNode<Key, T>* tempRight = node->right;
     node->right = temp;
     node->right->left->right = node->left;
     temp = node->right->left;
@@ -187,20 +195,23 @@ void AVLTree::lrRotation(AVLNode* &node, bool isInsert) {
 }
 
 // Purpose: Determine what rotation to perform
-void AVLTree::rotate(AVLNode* &node) {
+template<typename Key, typename T>
+void AVLTree<Key, T>::rotate(AVLNode<Key, T>* &node) {
 
 }
 
-bool AVLTree::searchHelper(AVLNode* node, int key) {
+template<typename Key, typename T>
+bool AVLTree<Key, T>::searchHelper(AVLNode<Key, T>* node, Key key) {
     if(node == NULL) {
         // Tree is empty
         return NULL;
     }
-    if(node->data == key) {
+    if(get<0>(node->data) == key) {
         // Found the node
+        cout << "Key: " << get<0>(node->data) << "\nValue: " << get<1>(node->data) << endl;
         return node;
     }
-    if(node->data > key) {
+    if(get<0>(node->data) > key) {
         // Go down the left subtree
         return searchHelper(node->left, key);
     } else {
@@ -210,11 +221,13 @@ bool AVLTree::searchHelper(AVLNode* node, int key) {
 }
 
 // Purpose: Find the data in the tree given a key
-bool AVLTree::search(int key) {
+template<typename Key, typename T>
+bool AVLTree<Key, T>::search(Key key) {
     return searchHelper(this->root, key);
 }
 
-void AVLTree::insertionRebalance(AVLNode* &node) {
+template<typename Key, typename T>
+void AVLTree<Key, T>::insertionRebalance(AVLNode<Key, T>* &node) {
     if(node == NULL) {
         return;
     }
@@ -227,24 +240,25 @@ void AVLTree::insertionRebalance(AVLNode* &node) {
  * Helper method for a recursive insert into the tree
  * flag: the height of the subtree inserted into has increased by one
 */
-bool AVLTree::insertHelper(AVLNode* &node, int key, bool& flag) {
+template<typename Key, typename T>
+bool AVLTree<Key, T>::insertHelper(AVLNode<Key, T>* &node, pair<Key, T> data, bool& flag) {
     if(node == NULL) {
-        node = new AVLNode;
-        node->data = key;
+        node = new AVLNode<Key, T>;
+        node->data = data;
         node->left = NULL;
         node->right = NULL;
         node->balanceFactor = 0;
         flag = true;
         return true;
     }
-    if(node->data == key) {
+    if(get<0>(node->data) == get<0>(data)) {
         // Data already exists
         flag = false;
         return false;
     }
-    if(node->data > key) {
+    if(get<0>(node->data) > get<0>(data)) {
         // Go down the left subtree
-        bool didInsert = insertHelper(node->left, key, flag);
+        bool didInsert = insertHelper(node->left, data, flag);
         if(didInsert && flag) {
             // height has increased by one from this insertion on left subtree
             node->balanceFactor += 1;
@@ -265,7 +279,7 @@ bool AVLTree::insertHelper(AVLNode* &node, int key, bool& flag) {
         return didInsert;
     } else {
         // Go down the right subtree
-        bool didInsert = insertHelper(node->right, key, flag);
+        bool didInsert = insertHelper(node->right, data, flag);
         if(didInsert && flag) {
             node->balanceFactor -= 1;
             if(node->balanceFactor <= -2) {
@@ -286,13 +300,15 @@ bool AVLTree::insertHelper(AVLNode* &node, int key, bool& flag) {
 }
 
 // Purpose: Insert into the tree and balance it
-bool AVLTree::insert(int key) {
+template<typename Key, typename T>
+bool AVLTree<Key, T>::insert(pair<Key, T> data) {
     bool flag = true;
-    return insertHelper(this->root, key, flag);
+    return insertHelper(this->root, data, flag);
 
 }
 
-AVLNode* getLargest(AVLNode* node) {
+template<typename Key, typename T>
+AVLNode<Key, T>* AVLTree<Key, T>::getLargest(AVLNode<Key, T>* node) {
     if(node == NULL) {
         return NULL;
     }
@@ -303,11 +319,12 @@ AVLNode* getLargest(AVLNode* node) {
     }
 }
 
-int AVLTree::deleteMax(AVLNode* &node) {
-    AVLNode* predecessor = getLargest(node);
-    int data = predecessor->data;
+template<typename Key, typename T>
+pair<Key, T> AVLTree<Key, T>::deleteMax(AVLNode<Key, T>* &node) {
+    AVLNode<Key, T>* predecessor = getLargest(node);
+    pair<Key, T> data = predecessor->data;
     bool flag = true;
-    removeHelper(this->root, data, flag);
+    removeHelper(this->root, get<0>(data), flag);
     return data;
 }
 
@@ -315,9 +332,10 @@ int AVLTree::deleteMax(AVLNode* &node) {
  * Remove a node that has 2 children
  * @param root
  */
-void AVLTree::removeBoth(AVLNode* node) {
+template<typename Key, typename T>
+void AVLTree<Key, T>::removeBoth(AVLNode<Key, T>* node) {
     // cout << node->balanceFactor << endl;
-    int newValue = deleteMax(node->left);
+    pair<Key, T> newValue = deleteMax(node->left);
     node->data = newValue;
     // cout << node->balanceFactor << endl;
     
@@ -327,7 +345,8 @@ void AVLTree::removeBoth(AVLNode* node) {
  * Remove a node that has only 1 child
  * @param root
  */
-void AVLTree::removeNode(AVLNode* & node, bool& flag) {
+template<typename Key, typename T>
+void AVLTree<Key, T>::removeNode(AVLNode<Key, T>* & node, bool& flag) {
     if(node->left == NULL && node->right == NULL) {
         // Leaf node
         // cout << "[Leaf RM] Removing " << node->data << endl;
@@ -337,13 +356,13 @@ void AVLTree::removeNode(AVLNode* & node, bool& flag) {
     } else if(node->left == NULL) {
         // Single child on the right
         // cout << "[Has right] Removing " << node->data << endl;
-        AVLNode* temp = node;
+        AVLNode<Key, T>* temp = node;
         node = node->right;
         delete temp;
     } else if(node->right == NULL) {
         // Single child on the left
         // cout << "[Has left] Removing " << node->data << endl;
-        AVLNode* temp = node;
+        AVLNode<Key, T>* temp = node;
         node = node->left;
         delete temp;
     } else {
@@ -356,15 +375,16 @@ void AVLTree::removeNode(AVLNode* & node, bool& flag) {
  * Decide how we are going to remove a node, and deal with the BF changes
  * flag: the height of the subtree deleted from has decreased by one
 */
-bool AVLTree::removeHelper(AVLNode* &node, int key, bool& flag) {
+template<typename Key, typename T>
+bool AVLTree<Key, T>::removeHelper(AVLNode<Key, T>* &node, Key key, bool& flag) {
     if(node == NULL) {
         return false;
     }
-    if(node->data == key) {
+    if(get<0>(node->data) == key) {
         flag = true;
         removeNode(node, flag);
         return true;
-    } else if(node->data > key) {
+    } else if(get<0>(node->data) > key) {
         bool didRemove = removeHelper(node->left, key, flag);
         if(didRemove && flag) {
             node->balanceFactor -= 1;
@@ -390,7 +410,7 @@ bool AVLTree::removeHelper(AVLNode* &node, int key, bool& flag) {
         }
         
         return didRemove;
-    } else if(node->data < key) {
+    } else if(get<0>(node->data) < key) {
         bool didRemove = removeHelper(node->right, key, flag);
         if(didRemove && flag) {
             node->balanceFactor += 1;
@@ -418,12 +438,14 @@ bool AVLTree::removeHelper(AVLNode* &node, int key, bool& flag) {
 }
 
 // Purpose: Remove from the tree and balance it
-bool AVLTree::remove(int key) {
+template<typename Key, typename T>
+bool AVLTree<Key, T>::remove(Key key) {
     bool flag = true;
     return removeHelper(this->root, key, flag);
 }
 
-void AVLTree::calculateBalanceFactors(AVLNode* &node) {
+template<typename Key, typename T>
+void AVLTree<Key, T>::calculateBalanceFactors(AVLNode<Key, T>* &node) {
     int leftHeight = calculateHeight(node->left);
     int rightHeight = calculateHeight(node->right);
     node->balanceFactor = leftHeight - rightHeight;
@@ -432,12 +454,13 @@ void AVLTree::calculateBalanceFactors(AVLNode* &node) {
 /**
  * Prints the tree in Inorder
  */
-void AVLTree::showInorder(AVLNode* node) {
+template<typename Key, typename T>
+void AVLTree<Key, T>::showInorder(AVLNode<Key, T>* node) {
     if(node == NULL) {
         return;
     }
     showInorder(node->left);
-    cout << "[" << node->data << "] :: " << node->balanceFactor << ", ";
+    cout << "[" << get<0>(node->data) << ": " << get<1>(node->data) << "] :: " << node->balanceFactor << ", ";
     showInorder(node->right);
 
 }
@@ -445,17 +468,19 @@ void AVLTree::showInorder(AVLNode* node) {
 /**
  * Prints the tree in Postorder
  */
-void AVLTree::showPostorder(AVLNode* node) {
+template<typename Key, typename T>
+void AVLTree<Key, T>::showPostorder(AVLNode<Key, T>* node) {
     if(node == NULL) {
         return;
     }
     showPostorder(node->left);
     showPostorder(node->right);
-    cout << "[" << node->data << "] :: " << node->balanceFactor << ", ";
+    cout << "[" << get<0>(node->data) << ": " << get<1>(node->data) << "] :: " << node->balanceFactor << ", ";
 }
 
 // Purpose: Show the contents of the tree
-void AVLTree::show() {
+template<typename Key, typename T>
+void AVLTree<Key, T>::show() {
     cout << "Inorder:\n";
     this->showInorder(this->root);
     cout << "\nPostOrder:\n";
@@ -463,7 +488,8 @@ void AVLTree::show() {
     cout << "\n";
 }
 
-int AVLTree::calculateHeight(AVLNode* node) { 
+template<typename Key, typename T>
+int AVLTree<Key, T>::calculateHeight(AVLNode<Key, T>* node) { 
     if(node == NULL) {
         return 0;
     }
@@ -471,11 +497,13 @@ int AVLTree::calculateHeight(AVLNode* node) {
 }
 
 // Purpose: Retrieve the height of the tree
-int AVLTree::height() {
+template<typename Key, typename T>
+int AVLTree<Key, T>::height() {
     return calculateHeight(this->root);
 }
 
-int AVLTree::sizeHelper(AVLNode* node, int &size) {
+template<typename Key, typename T>
+int AVLTree<Key, T>::sizeHelper(AVLNode<Key, T>* node, int &size) {
     if(node == NULL) {
         return size;
     }
@@ -486,23 +514,25 @@ int AVLTree::sizeHelper(AVLNode* node, int &size) {
 }
 
 // Purpose: Retrieve the number of nodes in the tree
-int AVLTree::size() {
+template<typename Key, typename T>
+int AVLTree<Key, T>::size() {
     int size = 0;
     return sizeHelper(this->root, size);
 }
 
-bool AVLTree::checkHelper(AVLNode* node) {
+template<typename Key, typename T>
+bool AVLTree<Key, T>::checkHelper(AVLNode<Key, T>* node) {
     if(node == NULL) {
         return true;
     }
     if(node->left == NULL && node->right != NULL) {
-        bool isBST = (node->data < node->right->data);
+        bool isBST = (get<0>(node->data) < get<0>(node->right->data));
         bool isAVL = (abs(calculateHeight(node->left) - calculateHeight(node->right)) <= 1);
         return (isBST && isAVL);
 
     }
     if(node->left != NULL && node->right == NULL) {
-        bool isBST = (node->data > node->left->data);
+        bool isBST = (get<0>(node->data) > get<0>(node->left->data));
         bool isAVL = (abs(calculateHeight(node->left) - calculateHeight(node->right)) <= 1);
         return (isBST && isAVL);
     }
@@ -514,6 +544,11 @@ bool AVLTree::checkHelper(AVLNode* node) {
 }
 
 // Purpose: Check to see if this tree is an AVL tree
-bool AVLTree::check() {
+template<typename Key, typename T>
+bool AVLTree<Key, T>::check() {
     return checkHelper(this->root);
 }
+
+
+template class AVLTree<int, int>;
+template class AVLTree<string, int>;

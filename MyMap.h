@@ -12,24 +12,29 @@ class MyMap {
     typedef unsigned size_type;
     typedef Key key_type;
     private:
-        value_type pair;
+        // value_type pair;
+        iterator<Key, T> iter;
     public:
-        class iterator {
+        class iterator: public AVLTree<Key, T> {
             private:
-                int data;
             public:
+                iterator();
+                ~iterator();
                 iterator operator*() {
 
                 }
                 // Post-fix ++
                 iterator operator++(int) {
-                    data++;
+                    // data++;
                 }
                 void set(int value) {
-                    data = value;
+                    // data = value;
+                }
+                void test(value_type testVal) {
+                    insert(testVal);
                 }
         };
-        explicit MyMap(const Compare& comp = Compare(), Allocator& = Allocator());
+        explicit MyMap(const Compare& comp = Compare(), const Allocator& = Allocator());
         MyMap(const MyMap<Key, T, Compare, Allocator>& x);
         ~MyMap();
         iterator begin();
