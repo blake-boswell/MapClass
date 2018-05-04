@@ -5,6 +5,8 @@
 // #include "BinarySearchTree.h"
 #include <utility>
 #include <string>
+#include <iostream>
+#include <stdlib.h>
 
 using namespace std;
 
@@ -34,6 +36,9 @@ struct AVLNode {
 template <typename Key, typename T>
 class AVLTree {
     typedef pair<Key, T> value_type;
+    typedef pair<Key, T>& reference;
+    typedef pair<Key, T>* pointer;
+    typedef AVLNode<Key, T> Node;
 public:
     
     AVLTree();
@@ -46,11 +51,51 @@ public:
     int height();
     int size();
     bool check();
+    // Post-fix ++
+    AVLTree<Key, T> operator++(int) {
+        cout << "Position before: " << get<0>(position) << endl;
+        // data++;
+        AVLTree iterator = *this;
+        if(position->right != NULL && position->left != NULL) {
+            position = getSmallest(position->right);
+        } else if(position->left != NULL) {
+            position = searchParent(root);
+        } else if(position->right != NULL) {
+            position = getSmallest(position->right);
+        } else if(position->right == NULL && position->left == NULL) {
+            // no children
+            // search and save every time you go left
+            position = searchSuccessor(root);
+        }
+        cout << "Position after: " << get<0>(position) << endl;
+        return iterator;
+    }
+    reference operator*() {
+        return position;
+    }
+    bool operator==(const AVLTree<Key, T>& rightSide) {
+        return position == rightSide.position;
+    }
+    void set(Node* value) {
+        this->position = value;
+    }
+    Node* begin() {
+        return this->root;
+    }
+    void test(value_type testVal) {
+        insert(testVal);
+    }
 
 protected:
-    AVLNode<Key, T>* root;
-    AVLNode<Key, T>* getLargest(AVLNode<Key, T>* node);
-    AVLNode<Key, T>* getSmallest(AVLNode<Key, T>* node);
+    Node* root;
+    Node* position;
+    Node* getLargest(Node* node);
+    Node* getSmallest(Node* node);
+    Node* searchParentHelper(Node* node, Key key);
+    Node* searchParent(Node* node);
+    Node* searchSuccessorHelper(Node* node, Key key, Node* savedNode);
+    Node* searchSuccessor(Node* node);
+
 
 private:
     void copyTree(AVLNode<Key, T>* &thisRoot, AVLNode<Key, T>* &sourceRoot);

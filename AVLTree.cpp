@@ -8,6 +8,7 @@ using namespace std;
 template<typename Key, typename T>
 AVLTree<Key, T>::AVLTree() {
     this->root = NULL;
+    this->position = NULL;
 }
 
 template<typename Key, typename T>
@@ -559,6 +560,56 @@ bool AVLTree<Key, T>::checkHelper(AVLNode<Key, T>* node) {
 template<typename Key, typename T>
 bool AVLTree<Key, T>::check() {
     return checkHelper(this->root);
+}
+
+template<typename Key, typename T>
+AVLNode<Key, T>* AVLTree<Key, T>::searchParentHelper(AVLNode<Key, T>* node, Key key) {
+    if(node == NULL || (node != NULL && get<0>(node->data) == key)) {
+        // Tree is empty or this is the root
+        return NULL;
+    }
+    if(node->left != NULL && get<0>(node->left->data) == key || node->right != NULL && get<0>(node->right->data) == key) {
+        // Found the node
+        cout << "Key: " << get<0>(node->data) << "\nValue: " << get<1>(node->data) << endl;
+        return node;
+    }
+    if(get<0>(node->data) > key) {
+        // Go down the left subtree
+        return searchParentHelper(node->left, key);
+    } else {
+        // Go down the right subtree
+        return searchParentHelper(node->right, key);
+    }
+}
+
+template<typename Key, typename T>
+AVLNode<Key, T>* AVLTree<Key, T>::searchParent(AVLNode<Key, T>* node) {
+    return searchParentHelper(node, get<0>(node->data));
+}
+
+template<typename Key, typename T>
+AVLNode<Key, T>* AVLTree<Key, T>::searchSuccessorHelper(AVLNode<Key, T>* node, Key key, AVLNode<Key, T>* savedNode) {
+    if(node == NULL) {
+        // Tree is empty
+        return NULL;
+    }
+    if(get<0>(node->data) == key) {
+        // Found the node
+        cout << "Key: " << get<0>(node->data) << "\nValue: " << get<1>(node->data) << endl;
+        return savedNode;
+    }
+    if(get<0>(node->data) > key) {
+        // Go down the left subtree
+        return searchHelper(node->left, key, node);
+    } else {
+        // Go down the right subtree
+        return searchHelper(node->right, key, savedNode);
+    }
+}
+
+template<typename Key, typename T>
+AVLNode<Key, T>* AVLTree<Key, T>::searchSuccessor(AVLNode<Key, T>* node) {
+    return searchSuccessorHelper(node, get<0>(node->data), node);
 }
 
 
